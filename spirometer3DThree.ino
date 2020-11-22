@@ -46,8 +46,8 @@ int outputValue = 0;        // value output to the PWM (analog out)
 float voltage = 0.0;
 float Pa = 0.0;
 float fev1 = 0.0;
-float vol[20];
-float volSec[20];
+float vol[30];
+float volSec[30];
 int snatch = 0;
 int fundex = 0;
 void setup() {
@@ -56,7 +56,7 @@ void setup() {
   minuteTotal = millis();
   pinMode(outPin, OUTPUT);
   digitalWrite(outPin, HIGH);
-  for(int p = 0;p < 20; p++){
+  for(int p = 0;p < 30; p++){
     vol[p] = 0;
     volSec[p] = 0;
   }
@@ -171,6 +171,8 @@ volumeTotal = volFlow * (millis() - TimerNow) + volumeTotal;
     Serial.println(timerBreath/1000);
     Serial.print("MaxFlow");
     Serial.println(maxFlow);
+    tft.setRotation(1);
+    tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_GREEN, TFT_BLACK);
     tft.drawCentreString("FEV1",32,20,4);
      tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -184,8 +186,10 @@ volumeTotal = volFlow * (millis() - TimerNow) + volumeTotal;
   tft.setTextColor(0xFBE0, TFT_BLACK); // Orange
   tft.drawNumber(volumeTotal,70,70,7);
     //Serial.println(secondsBreath);
+    delay(5000);
+    tft.fillScreen(TFT_BLACK);
     printer();
-    for(int p = 0;p < 20; p++){
+    for(int p = 0;p < 30; p++){
     vol[p] = 0;
     volSec[p] = 0;
   }
@@ -207,10 +211,41 @@ volumeTotal = volFlow * (millis() - TimerNow) + volumeTotal;
   delay(20);
 }
 void printer(){
-  for(int p = 0; p< 20; p++){
+   int x = 1;
+  for(int p = 0; p< 30; p++){
     Serial.print("vol");
     Serial.println(vol[p]);
     Serial.print("volspeed");
     Serial.println(volSec[p]);
+     int x = map(vol[p],0,3000,0,20);
+   
+    linearMeter(x,10,p*8,5,10,3,25,1);
+    Serial.print("x");
+    Serial.println(x);
+  }
+}
+void linearMeter(int val, int x, int y, int w, int h, int g, int n, byte s)
+{
+  tft.setRotation(0);
+  // Variable to save "value" text colour from scheme and set default
+  int colour = TFT_BLUE;
+  // Draw n colour blocks
+  for (int b = 1; b <= n; b++) {
+    if (val > 0 && b <= val) { // Fill in coloured blocks
+      switch (s) {
+        case 0: colour = TFT_RED; break; // Fixed colour
+        case 1: colour = TFT_GREEN; break; // Fixed colour
+        case 2: colour = TFT_BLUE; break; // Fixed colour
+        //case 3: colour = rainbowColor(map(b, 0, n, 127,   0)); break; // Blue to red
+        //case 4: colour = rainbowColor(map(b, 0, n,  63,   0)); break; // Green to red
+        //case 5: colour = rainbowColor(map(b, 0, n,   0,  63)); break; // Red to green
+        //case 6: colour = rainbowColor(map(b, 0, n,   0, 159)); break; // Rainbow (red to violet)
+      }
+      tft.fillRect(x + b*(w+g), y, w, h, colour);
+    }
+    else // Fill in blank segments
+    {
+      tft.fillRect(x + b*(w+g), y, w, h, TFT_DARKGREY);
+    }
   }
 }

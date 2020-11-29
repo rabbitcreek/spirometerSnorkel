@@ -59,7 +59,8 @@ float volSec[30];
 int snatch = 0;
 int fundex = 0;
 void setup() {
-  // initialize serial communications at 9600 bps:
+  pinMode(0, INPUT_PULLUP);
+  pinMode(35, INPUT_PULLUP);
   Serial.begin(115200);
   minuteTotal = millis();
   Blynk.begin(auth, ssid, pass);
@@ -101,7 +102,7 @@ void loop() {
   Pa = (190 * voltage/3.3) - 31;
      //Serial.print("pa");
      //Serial.println(Pa);
-  if( Pa > 1 ) {
+  if(( Pa > 1 ) || (fundex > 5 && fundex < 25)){
     if (newBreath < 1) {
       timerBreath = millis();
       fev1 = 0.0;
@@ -178,9 +179,11 @@ volumeTotal = volFlow * (millis() - TimerNow) + volumeTotal;
     //Serial.println(secondsBreath);
     delay(5000);
     tft.fillScreen(TFT_BLACK);
-    //printer();
-    blynkPrint();
-    //dataDump();
+    printer();
+    dataDump();
+    if(Blynk.connected())blynkPrint();
+    
+    
     }
     for(int p = 0;p < 30; p++){
     vol[p] = 0;
@@ -213,7 +216,7 @@ void dataDump(){
       tft.drawNumber(timerBreath/1000,160,49,4);
        tft.drawNumber((fev1/volumeTotal) * 100,160,71,4);
         tft.drawNumber(maxFlow,160,93,4);
-    
+    delay(3000);
    
     
 }
@@ -227,8 +230,9 @@ void printer(){
      int x = map(vol[p],0,5000,0,20);
    
     linearMeter(x,10,p*8,5,10,3,25,1);
-    delay(2000);
+    
   }
+  delay(3000);
 }
 void blynkPrint(){
    tft.setRotation(1);

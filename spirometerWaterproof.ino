@@ -32,6 +32,7 @@ float area_2 = 0.000201;
 float rho = 1.225; //Demsity of air in kg/m3;
 float dt = 0;
 float timerBreath;
+float totalBreathTime;
 float secondsBreath;
 float minuteTotal;
 int newBreath = 0;
@@ -92,12 +93,23 @@ void loop() {
   Pa = (190 * voltage/3.3) - 38;
   if( Pa > 1 ) {
     if (newBreath < 1) {
+      totalBreathTime = (millis() - timerBreath)/1000.0;
       timerBreath = millis();
       //Serial.print("Breathvolume:");
       //Serial.println(volumeTotal);
        
-      if(volumeTotal > 100){
+      if(volumeTotal > 200){
       totalBreath = totalBreath + 1;
+      
+    logfile.print(volumeTotal);
+    logfile.print("              ");
+    logfile.print(secondsBreath);
+    logfile.print("                ");
+    logfile.print(totalBreathTime);
+    logfile.print("               ");
+    logfile.println(runningTotal);
+    
+    logfile.flush();
       }
       volumeTotal = 0;
       newBreath = 1;
@@ -135,13 +147,7 @@ volumeTotal = volFlow * (millis() - TimerNow) + volumeTotal;
     if (totalBreath%2) {
       digitalWrite(outPin, LOW);
     } else digitalWrite(outPin, HIGH);
-    logfile.print(volumeTotal);
-    
-    logfile.print("              ");
-    logfile.print(secondsBreath);
-    logfile.print("               ");
-    logfile.println(runningTotal);
-    logfile.flush();
+   
     }
   }
   TimerNow = millis();

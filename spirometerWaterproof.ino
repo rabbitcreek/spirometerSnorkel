@@ -139,7 +139,7 @@ volumeTotal = volFlow * (millis() - TimerNow) + volumeTotal;
   } else if(newBreath){
     newBreath = 0;
     //Serial.print("time for breath");
-    if(volumeTotal > 200){
+    if(volumeTotal > 100){
     secondsBreath = (millis() - timerBreath)/1000;
     //Serial.println(secondsBreath);
     runningTotal = runningTotal + volumeTotal;
